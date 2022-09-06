@@ -1,0 +1,64 @@
+{
+  "name": "@alejandro.dev/rn-rest-client",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "rebuild": "yarn test && yarn build",
+    "build": "rollup -c",
+    "start": "rollup -c -w",
+    "test": "jest",
+    "preversion": "npm test",
+    "version": "npm run build && git add -A dist",
+    "postversion": "git push && git push --tags && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alejandro-devop/triko-translation"
+  },
+  "keywords": [],
+  "author": "Alejandro Quiroz <alejandro.devop@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alejandro-devop/triko-translation"
+  },
+  "homepage": "https://github.com/alejandro-devop/triko-translation",
+  "devDependencies": {
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-react": "^7.13.13",
+    "@babel/preset-typescript": "^7.13.0",
+    "@testing-library/react": "^11.2.6",
+    "@types/jest": "^26.0.22",
+    "@types/react": "^17.0.3",
+    "@types/react-native": "^0.64.5",
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-runtime": "^6.26.0",
+    "jest": "^26.6.3",
+    "prettier": "^2.3.0",
+    "react": "^18.0.0",
+    "react-native": "^0.69.4",
+    "regenerator-runtime": "^0.13.7",
+    "rollup": "^3.0.0-4",
+    "rollup-plugin-typescript2": "^0.32.1",
+    "typescript": "^4.2.4"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-native": "^0.69.4"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/src/setupTests.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ]
+  },
+  "dependencies": {}
+}

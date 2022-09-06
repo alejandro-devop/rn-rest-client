@@ -1,0 +1,25 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended" // agregar el plugin que integra eslint con prettier
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true // permite a eslint analizar los archivos jsx o tsx
+      }
+    },
+    "rules": {
+      // Aca puedes modificar alguna regla específica, por ejemplo:
+      // "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/no-explicit-any": "off"
+    },
+    "settings": {
+      "react": {
+        "version": "detect" // para detectar la versión de reactjs
+      }
+    }
+  }
+  
