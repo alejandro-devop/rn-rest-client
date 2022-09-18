@@ -3,16 +3,19 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var React = require('react');
-var reactNative = require('react-native');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { default: e }; }
 
 var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-var SomeComponent = function () {
-    return (React__default.default.createElement(reactNative.View, null,
-        React__default.default.createElement(reactNative.Text, null, " Some content")));
+var RestClientContext = React__default.default.createContext({});
+var RestClientContextProvider = RestClientContext.Provider;
+RestClientContext.Consumer;
+
+var RestClientProvider = function (_a) {
+    var children = _a.children;
+    return React__default.default.createElement(RestClientContextProvider, { value: {} }, children);
 };
 
-exports.SomeComponent = SomeComponent;
+exports.RestClientProvider = RestClientProvider;
 //# sourceMappingURL=index.js.map

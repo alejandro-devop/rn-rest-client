@@ -1,2 +1,2 @@
-import SomeComponent from './SomeComponent';
-export { SomeComponent };
+import RestClientProvider from './rest-client-provider';
+export { RestClientProvider };
