@@ -105,17 +105,38 @@ class HttpClient {
         return url
     }
 
+    private clearMethod(url: string) {
+        /**
+         * If the url has type definition we must clean it
+         */
+        if (url.includes('<') && url.includes('>')) {
+            url = url.replace(new RegExp(`<.*>`, 'g'), '')
+        }
+        return url
+    }
+
+    private getMethod(url: string) {
+        let type = ''
+        const matches = url.match(new RegExp('(<[a-zA-Z]+>)', 'g'))
+        const [match] = matches || []
+        type = match?.replace(new RegExp('<|>', 'g'), '')
+        return type
+    }
+
     /**
      * Converts a dot notation string into a valid url to make a request
      * @param path string
      * @param options ResolvePathOptions
-     * @returns
+     * @returns [string, string]
      */
     public resolvePath(path: string, options?: ResolvePathOptions) {
         let url = this.findEndpoint(path)
+        const urlDefinedMethod = this.getMethod(url)
+        url = this.clearMethod(url)
         url = this.executingReplacements(url, options)
         url = this.addUrlParams(url, options)
-        return `${this.server}${url}`
+
+        return [`${this.server}${url}`, urlDefinedMethod]
     }
 }
 

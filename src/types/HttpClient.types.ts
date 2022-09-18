@@ -49,4 +49,5 @@ export type ResolvePathOptions = {
     replacements?: { [k: string]: number | string }
     urlParams?: { [k: string]: number | string }
     replacementConfig?: ReplacementsConfigType
+    debugUrl?: boolean
 }

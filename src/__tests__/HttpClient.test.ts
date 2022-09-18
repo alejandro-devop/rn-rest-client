@@ -11,6 +11,10 @@ const mockedEndPoints: EndpointsConfigType = {
         delete: '/categories/view/:id:',
         list: '/categories/list'
     },
+    product: {
+        view: '<get>/products/view',
+        save: '<post>/products/save'
+    },
     single: '/home/single'
 }
 const client = new HttpClient({ server: mockedServer, endpoints: mockedEndPoints })
@@ -40,30 +44,30 @@ describe('[HttpClient]: ', () => {
     describe('[HttpClient]: Testing the url resolver', () => {
         describe('WHEN just passing the path with multiple parts: ', () => {
             it('SHOULD return the url', () => {
-                const url = client.resolvePath('security.login')
+                const [url] = client.resolvePath('security.login')
                 expect(url).toBe('http://some-server.com/security/login')
             })
         })
         describe('WHEN just passing the path with only one part: ', () => {
             it('SHOULD return the url', () => {
-                const url = client.resolvePath('single')
+                const [url] = client.resolvePath('single')
                 expect(url).toBe('http://some-server.com/single')
             })
         })
         describe('WHEN passing a path that does not exists: ', () => {
             it('SHOULD return the url', () => {
-                const url = client.resolvePath('security.register')
+                const [url] = client.resolvePath('security.register')
                 expect(url).toBe('http://some-server.com/invalid-path')
             })
         })
         describe('WHEN passing replacements to the url', () => {
             it('SHOULD replace the value: ', () => {
-                const url = client.resolvePath('categories.view', {
+                const [url] = client.resolvePath('categories.view', {
                     replacements: {
                         id: 1
                     }
                 })
-                const secondUrl = client.resolvePath('categories.delete', {
+                const [secondUrl] = client.resolvePath('categories.delete', {
                     replacementConfig: {
                         startToken: ':',
                         endToken: ':'
@@ -77,7 +81,7 @@ describe('[HttpClient]: ', () => {
             })
         })
         describe('WHEN passing the url params:', () => {
-            const url = client.resolvePath('categories.list', {
+            const [url] = client.resolvePath('categories.list', {
                 urlParams: {
                     page: 1,
                     pageSize: 10,
@@ -87,6 +91,18 @@ describe('[HttpClient]: ', () => {
             expect(url).toBe(
                 'http://some-server.com/categories/list?page=1&pageSize=10&filter=some%20value'
             )
+        })
+        describe('WHEN defining the method in the url: ', () => {
+            const [url, type] = client.resolvePath('product.view', {
+                debugUrl: true
+            })
+            const [secondUrl, secondType] = client.resolvePath('product.save', {
+                debugUrl: true
+            })
+            expect(url).toBe('http://some-server.com/products/view')
+            expect(type).toBe('get')
+            expect(secondUrl).toBe('http://some-server.com/products/save')
+            expect(secondType).toBe('post')
         })
     })
 })
