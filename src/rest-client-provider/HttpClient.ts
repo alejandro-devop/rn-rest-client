@@ -2,8 +2,12 @@ import {
     HeaderTypes,
     HttpClientConfig,
     EndpointsConfigType,
-    ResolvePathOptions
+    ResolvePathOptions,
+    DoRequestConfigurationType
 } from '../types/HttpClient.types'
+import axios from 'axios'
+import { DoRequestResponseType } from '../types/HttpClient.types'
+import _ from 'lodash'
 
 /**
  * This class contains the logic to interact with http requests
@@ -137,6 +141,40 @@ class HttpClient {
         url = this.addUrlParams(url, options)
 
         return [`${this.server}${url}`, urlDefinedMethod]
+    }
+
+    public async doRequest(
+        path: string,
+        config?: DoRequestConfigurationType
+    ): Promise<DoRequestResponseType> {
+        const [url, methodType] = this.resolvePath(path, config)
+        const { method = 'get' } = config || {}
+        if (!_.isEmpty(methodType) && methodType !== method) {
+            throw new Error('Invalid method for endpoint')
+        }
+
+        try {
+            let payload = config?.payload
+            if (method === 'post') {
+                const { data, status } = await axios.post(url, payload)
+                return {
+                    status,
+                    data
+                }
+            } else {
+                const { data, status } = await axios.get(url)
+                return {
+                    status,
+                    data
+                }
+            }
+        } catch (error) {
+            return {
+                errorMessage: error.message,
+                status: error.status,
+                data: error.data
+            }
+        }
     }
 }
 

@@ -1,22 +1,7 @@
 import HttpClient from '../rest-client-provider/HttpClient'
-import { EndpointsConfigType } from '../types/HttpClient.types'
-const mockedServer = 'http://some-server.com'
-const mockedEndPoints: EndpointsConfigType = {
-    security: {
-        login: '/security/login',
-        logout: '/security/logout'
-    },
-    categories: {
-        view: '/categories/view/{id}',
-        delete: '/categories/view/:id:',
-        list: '/categories/list'
-    },
-    product: {
-        view: '<get>/products/view',
-        save: '<post>/products/save'
-    },
-    single: '/home/single'
-}
+import { mockedEndPoints, mockedServer } from '../__mocks__/server.mock'
+import mockedCategories from '../__mocks__/categories.json'
+
 const client = new HttpClient({ server: mockedServer, endpoints: mockedEndPoints })
 
 describe('[HttpClient]: ', () => {
@@ -103,6 +88,52 @@ describe('[HttpClient]: ', () => {
             expect(type).toBe('get')
             expect(secondUrl).toBe('http://some-server.com/products/save')
             expect(secondType).toBe('post')
+        })
+    })
+    describe('[HttpClient]: Testing do request', () => {
+        describe('WHEN calling it raw: ', () => {
+            it('SHOULD return the response: ', async () => {
+                const fn = client.doRequest('categories.list')
+                const expectedResponse = mockedCategories
+                expect(fn instanceof Promise).toBeTruthy()
+                const { data } = await client.doRequest('categories.list')
+                expect(data instanceof Array).toBeTruthy()
+                expect(JSON.stringify(data)).toBe(JSON.stringify(expectedResponse))
+            })
+        })
+        describe('WHEN calling a invalid request: ', () => {
+            it('SHOULD raise a exception: ', async () => {
+                const response = await client.doRequest('invalidZone.invalid')
+                expect(JSON.stringify(response)).toBe(
+                    JSON.stringify({
+                        errorMessage: 'Invalid request',
+                        status: undefined,
+                        data: undefined
+                    })
+                )
+            })
+        })
+        describe('WHEN sending wrong Method with method validation', () => {
+            it('SHOULD return a invalid url method: ', async () => {
+                try {
+                    await client.doRequest('product.view', {
+                        method: 'post'
+                    })
+                } catch (err) {
+                    expect(err.message).toBe('Invalid method for endpoint')
+                }
+            })
+        })
+        describe('WHEN sending a simple post: ', () => {
+            it('SHOULD return a simple response: ', async () => {
+                const expectedPayload = { foo: true, bar: true }
+                const { data, status } = await client.doRequest('tests.doPost', {
+                    method: 'post',
+                    payload: expectedPayload
+                })
+                expect(JSON.stringify(data)).toBe(JSON.stringify(expectedPayload))
+                expect(status).toBe(200)
+            })
         })
     })
 })

@@ -51,3 +51,15 @@ export type ResolvePathOptions = {
     replacementConfig?: ReplacementsConfigType
     debugUrl?: boolean
 }
+
+export type DoRequestConfigurationType = ResolvePathOptions & {
+    method?: HttpMethodType
+    payload?: { [k: string]: any }
+}
+
+export type DoRequestResponseType = {
+    status: number
+    data: any
+    error?: boolean
+    errorMessage?: string
+}
