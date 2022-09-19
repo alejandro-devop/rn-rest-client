@@ -161,6 +161,26 @@ class HttpClient {
                     status,
                     data
                 }
+            } else if (method === 'put') {
+                const response = await axios.put(url, payload)
+                const { data, status } = response
+                console.log('Response: ', response)
+                return {
+                    status,
+                    data
+                }
+            } else if (method === 'patch') {
+                const { data, status } = await axios.patch(url, payload)
+                return {
+                    status,
+                    data
+                }
+            } else if (method === 'delete') {
+                const { data, status } = await axios.delete(url)
+                return {
+                    status,
+                    data
+                }
             } else {
                 const { data, status } = await axios.get(url)
                 return {

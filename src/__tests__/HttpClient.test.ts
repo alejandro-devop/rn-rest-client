@@ -135,5 +135,37 @@ describe('[HttpClient]: ', () => {
                 expect(status).toBe(200)
             })
         })
+        describe('WHEN sending a simple put: ', () => {
+            it('SHOULD return a simple response: ', async () => {
+                const expectedPayload = { foo: true, bar: true }
+                const { data, status } = await client.doRequest('tests.doPut', {
+                    method: 'put',
+                    payload: expectedPayload
+                })
+                expect(JSON.stringify(data)).toBe(JSON.stringify(expectedPayload))
+                expect(status).toBe(200)
+            })
+        })
+        describe('WHEN sending a simple patch: ', () => {
+            it('SHOULD return a simple response: ', async () => {
+                const expectedPayload = { foo: true, bar: true }
+                const { data, status } = await client.doRequest('tests.doPatch', {
+                    method: 'patch',
+                    payload: expectedPayload
+                })
+                expect(JSON.stringify(data)).toBe(JSON.stringify(expectedPayload))
+                expect(status).toBe(200)
+            })
+        })
+        describe('WHEN sending a simple delete: ', () => {
+            it('SHOULD return a simple response: ', async () => {
+                const expectedPayload = { deleted: true }
+                const { data, status } = await client.doRequest('tests.doDelete', {
+                    method: 'delete'
+                })
+                expect(JSON.stringify(data)).toBe(JSON.stringify(expectedPayload))
+                expect(status).toBe(200)
+            })
+        })
     })
 })

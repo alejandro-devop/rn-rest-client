@@ -12,7 +12,10 @@ export const mockedEndPoints: EndpointsConfigType = {
         list: '/categories/list'
     },
     tests: {
-        doPost: '<post>/some/post'
+        doPost: '<post>/some/post',
+        doPut: '<put>/some/put',
+        doPatch: '<patch>/some/patch',
+        doDelete: '<delete>/some/delete'
     },
     product: {
         view: '<get>/products/view',
