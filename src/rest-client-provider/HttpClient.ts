@@ -164,7 +164,6 @@ class HttpClient {
             } else if (method === 'put') {
                 const response = await axios.put(url, payload)
                 const { data, status } = response
-                console.log('Response: ', response)
                 return {
                     status,
                     data

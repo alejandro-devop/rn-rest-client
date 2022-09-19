@@ -1,5 +1,5 @@
 import React from 'react'
-type RestClientContextType = {}
+import { RestClientContextType } from '../types/RestClientProvider.types'
 
 export const RestClientContext = React.createContext<RestClientContextType>({})
 export const RestClientContextProvider = RestClientContext.Provider
