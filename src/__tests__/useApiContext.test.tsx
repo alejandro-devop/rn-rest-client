@@ -17,16 +17,13 @@ describe('[useApiContext]: ', () => {
         </RestClientProvider>
     )
     describe('WHEN getting the context', () => {
-        it('...', async () => {
+        it('SHOULD return the http client', async () => {
             await act(async () => {
                 const { result, waitForNextUpdate } = renderHook(() => useApiContext(), { wrapper })
                 await waitForNextUpdate()
                 const { client } = result.current || {}
                 expect(client instanceof HttpClient).toBeTruthy()
             })
-        })
-        it('Some', () => {
-            expect(true).toBeTruthy()
         })
     })
 })

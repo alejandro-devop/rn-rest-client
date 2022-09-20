@@ -76,6 +76,7 @@
       "!src/**/*types.{js,jsx,ts,tsx}",
       "!src/types/**",
       "!src/index.ts",
+      "!src/**/*index.{js,jsx,ts,tsx}",
       "!dist/**/*.{js,jsx,ts,tsx}"
     ]
   },
