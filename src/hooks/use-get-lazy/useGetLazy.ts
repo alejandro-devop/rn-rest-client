@@ -4,7 +4,7 @@ import { RequestConfigType, RequestConfigOverrideType } from '../../types/HttpCl
 
 type UseGetLazyReturnType = [(overrideOptions?: RequestConfigOverrideType) => Promise<any>, boolean]
 
-const useGetLazy = <UrlType extends string, ResponseType extends any>(
+const useGetLazy = <UrlType extends string>(
     url: UrlType,
     options?: RequestConfigType
 ): UseGetLazyReturnType => {

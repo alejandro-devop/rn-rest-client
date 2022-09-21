@@ -1,10 +1,10 @@
 import React from 'react'
 import useApiContext from '../use-api-context/useApiContext'
 
-type UseDeleteReturnType = []
+type UseDeleteReturnType = any
 type OverrideOptionsType = any
 
-const useDelete = <UrlType extends string>(url: UrlType) => {
+const useDelete = <UrlType extends string>(url: UrlType): UseDeleteReturnType => {
     const [loading, setLoading] = React.useState(false)
     const { client } = useApiContext()
     const sendRequest = async (overrideOptions?: OverrideOptionsType) => {

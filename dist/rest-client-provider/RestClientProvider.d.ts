@@ -1,4 +1,5 @@
 import React from 'react';
+import { HttpClientConfig } from '../types/HttpClient.types';
 declare type ApiMockType = {
     ok?: any;
     fail?: any;
@@ -6,14 +7,7 @@ declare type ApiMockType = {
 };
 interface RestClientProviderProps {
     children: React.ReactNode;
-    config: {
-        server: string;
-        endpoints: {
-            [k: string]: string | {
-                [k: string]: string;
-            };
-        };
-    };
+    config: HttpClientConfig;
     mocks?: {
         [k: string]: ApiMockType;
     };

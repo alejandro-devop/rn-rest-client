@@ -1,10 +1,10 @@
 import React from 'react'
 import useApiContext from '../use-api-context/useApiContext'
 
-type UsePutReturnType = []
+type UsePutReturnType = any
 type OverrideOptionsType = any
 
-const usePut = <UrlType extends string>(url: UrlType) => {
+const usePut = <UrlType extends string>(url: UrlType): UsePutReturnType => {
     const [loading, setLoading] = React.useState(false)
     const { client } = useApiContext()
     const sendRequest = async <PayloadType = any>(
