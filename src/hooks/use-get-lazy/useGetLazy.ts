@@ -2,10 +2,12 @@ import React from 'react'
 import useApiContext from '../use-api-context/useApiContext'
 import { RequestConfigType, RequestConfigOverrideType } from '../../types/HttpClient.types'
 
+type UseGetLazyReturnType = [(overrideOptions?: RequestConfigOverrideType) => Promise<any>, boolean]
+
 const useGetLazy = <UrlType extends string, ResponseType extends any>(
     url: UrlType,
     options?: RequestConfigType
-) => {
+): UseGetLazyReturnType => {
     const { onCompleted, replacements, urlParams } = options || {}
     const [loading, setLoading] = React.useState<boolean>(false)
     const { client } = useApiContext()
@@ -33,7 +35,7 @@ const useGetLazy = <UrlType extends string, ResponseType extends any>(
         }
     }, [])
 
-    return [sendRequest, loading, {}]
+    return [sendRequest, loading]
 }
 
 export default useGetLazy

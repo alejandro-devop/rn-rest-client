@@ -3,6 +3,7 @@ import RestClientProvider from '../rest-client-provider'
 import { mockedServer, mockedEndPoints } from '../__mocks__/server.mock'
 import { renderHook, act } from '@testing-library/react-hooks'
 import { useGet } from '../hooks'
+import categories from '../__mocks__/categories.json'
 
 describe('[useGet]: ', () => {
     const wrapper = ({ children }: any) => (
@@ -22,9 +23,8 @@ describe('[useGet]: ', () => {
                     wrapper
                 })
                 await waitForNextUpdate()
-                const [data, loading] = result.current
-                expect(loading).toBe(true)
-                expect(data).toBeUndefined()
+                const [, loading] = result.current
+                expect(loading).toBe(false)
             })
         })
     })
@@ -39,22 +39,20 @@ describe('[useGet]: ', () => {
                     }
                 )
                 await waitForNextUpdate()
-                const [data, loading] = result.current
-                expect(loading).toBe(true)
-                expect(JSON.stringify(data)).toBe(JSON.stringify(defaultData))
+                const [, loading] = result.current
+                expect(loading).toBe(false)
             })
         })
     })
     describe('WHEN fetching data:', () => {
-        it('SHOULD get the endpoint data', async () => {
+        it('SHOULD return the http client', async () => {
             await act(async () => {
-                const { result, waitForNextUpdate } = renderHook(() => useGet('categories.list'))
+                const { result, waitForNextUpdate } = renderHook(() => useGet('categories.list'), {
+                    wrapper
+                })
                 await waitForNextUpdate()
-                const [data, loading, log] = result.current || {}
-                const { requestedOnce, requesting } = log || ({} as any)
-                expect(requestedOnce).toBeFalsy()
-                expect(requesting).toBeTruthy()
-                expect(loading).toBeTruthy()
+                const [data] = result.current
+                expect(JSON.stringify(data)).toBe(JSON.stringify(categories))
             })
         })
     })
