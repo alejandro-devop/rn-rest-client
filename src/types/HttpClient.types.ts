@@ -63,3 +63,14 @@ export type DoRequestResponseType = {
     error?: boolean
     errorMessage?: string
 }
+
+export type RequestConfigType = {
+    defaultData?: any
+    onCompleted?: (data: any) => Promise<any>
+} & ResolvePathOptions
+
+export type RequestConfigOverrideType = {
+    replacements?: { [k: string]: number | string }
+    urlParams?: { [k: string]: number | string }
+    replacementConfig?: ReplacementsConfigType
+}

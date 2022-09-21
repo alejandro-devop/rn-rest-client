@@ -103,14 +103,12 @@ describe('[HttpClient]: ', () => {
         })
         describe('WHEN calling a invalid request: ', () => {
             it('SHOULD raise a exception: ', async () => {
-                const response = await client.doRequest('invalidZone.invalid')
-                expect(JSON.stringify(response)).toBe(
-                    JSON.stringify({
-                        errorMessage: 'Invalid request',
-                        status: undefined,
-                        data: undefined
-                    })
-                )
+                try {
+                    await client.doRequest('invalidZone.invalid')
+                } catch (error) {
+                    const { errorMessage } = error
+                    expect(errorMessage).toBe('Invalid request')
+                }
             })
         })
         describe('WHEN sending wrong Method with method validation', () => {

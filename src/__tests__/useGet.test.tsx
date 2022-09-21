@@ -23,7 +23,7 @@ describe('[useGet]: ', () => {
                 })
                 await waitForNextUpdate()
                 const [data, loading] = result.current
-                expect(loading).toBe(false)
+                expect(loading).toBe(true)
                 expect(data).toBeUndefined()
             })
         })
@@ -40,8 +40,21 @@ describe('[useGet]: ', () => {
                 )
                 await waitForNextUpdate()
                 const [data, loading] = result.current
-                expect(loading).toBe(false)
+                expect(loading).toBe(true)
                 expect(JSON.stringify(data)).toBe(JSON.stringify(defaultData))
+            })
+        })
+    })
+    describe('WHEN fetching data:', () => {
+        it('SHOULD get the endpoint data', async () => {
+            await act(async () => {
+                const { result, waitForNextUpdate } = renderHook(() => useGet('categories.list'))
+                await waitForNextUpdate()
+                const [data, loading, log] = result.current || {}
+                const { requestedOnce, requesting } = log || ({} as any)
+                expect(requestedOnce).toBeFalsy()
+                expect(requesting).toBeTruthy()
+                expect(loading).toBeTruthy()
             })
         })
     })

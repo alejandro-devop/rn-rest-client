@@ -188,7 +188,7 @@ class HttpClient {
                 }
             }
         } catch (error) {
-            return {
+            throw {
                 errorMessage: error.message,
                 status: error.status,
                 data: error.data
