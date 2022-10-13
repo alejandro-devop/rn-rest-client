@@ -87,6 +87,7 @@ function __generator(thisArg, body) {
  */
 var HttpClient = /** @class */ (function () {
     function HttpClient(config) {
+        var _this = this;
         /**
          * Http headers which you can find here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
          */
@@ -94,9 +95,28 @@ var HttpClient = /** @class */ (function () {
             Accept: 'application/json',
             'Content-Type': 'application/json'
         };
-        var server = config.server, endpoints = config.endpoints;
+        this.addHeaders = function (headers) {
+            _this.headers = __assign(__assign({}, _this.headers), headers);
+        };
+        this.setToken = function (token) {
+            _this.token = token;
+            return _this;
+        };
+        this.setRefresh = function (refresh) {
+            _this.refreshToken = refresh;
+            return _this;
+        };
+        this.getToken = function () {
+            return _this.token;
+        };
+        var server = config.server, endpoints = config.endpoints, onRefreshToken = config.onRefreshToken, shouldRefreshToken = config.shouldRefreshToken, auth = config.auth;
         this.server = server;
         this.endpoints = endpoints;
+        this.shouldRefreshToken = shouldRefreshToken === null || shouldRefreshToken === void 0 ? void 0 : shouldRefreshToken.bind(this);
+        this.onRefreshToken = onRefreshToken === null || onRefreshToken === void 0 ? void 0 : onRefreshToken.bind(this);
+        if (auth !== undefined) {
+            this.addHeaders({ Authorization: auth });
+        }
     }
     /**
      * Current headers configured for the client
@@ -192,75 +212,120 @@ var HttpClient = /** @class */ (function () {
         url = this.clearMethod(url);
         url = this.executingReplacements(url, options);
         url = this.addUrlParams(url, options);
+        // Append a tailing slash to avoid conflicts for headers
+        if (options === null || options === void 0 ? void 0 : options.appendSlash) {
+            url = "".concat(url, "/").replace(/\/\//g, '/');
+        }
         return ["".concat(this.server).concat(url), urlDefinedMethod];
     };
     HttpClient.prototype.doRequest = function (path, config) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, url, methodType, _b, method, payload, _c, data, status_1, response, data, status_2, _d, data, status_3, _e, data, status_4, _f, data, status_5, error_1;
-            return __generator(this, function (_g) {
-                switch (_g.label) {
+            var _a, url, methodType, _b, _c, method, form, headers, mergedHeaders, sendRequest, response, error_1, data;
+            var _this = this;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
                         _a = this.resolvePath(path, config), url = _a[0], methodType = _a[1];
-                        _b = (config || {}).method, method = _b === void 0 ? 'get' : _b;
+                        _b = config || {}, _c = _b.method, method = _c === void 0 ? 'get' : _c, form = _b.form, headers = _b.headers;
                         if (!___default.default.isEmpty(methodType) && methodType !== method) {
                             throw new Error('Invalid method for endpoint');
                         }
-                        _g.label = 1;
+                        mergedHeaders = __assign(__assign({}, this.headers), headers);
+                        _d.label = 1;
                     case 1:
-                        _g.trys.push([1, 12, , 13]);
-                        payload = config === null || config === void 0 ? void 0 : config.payload;
-                        if (!(method === 'post')) return [3 /*break*/, 3];
-                        return [4 /*yield*/, axios__default.default.post(url, payload)];
+                        _d.trys.push([1, 3, , 4]);
+                        sendRequest = function () { return __awaiter(_this, void 0, void 0, function () {
+                            var payload, formData, response_1, data, status_1, response_2, data, status_2, _a, data, status_3, _b, data, status_4, _c, data, status_5;
+                            return __generator(this, function (_d) {
+                                switch (_d.label) {
+                                    case 0:
+                                        payload = (config === null || config === void 0 ? void 0 : config.payload) || {};
+                                        formData = new FormData();
+                                        if (form === true && payload) {
+                                            mergedHeaders['Content-Type'] = 'multipart/form-data';
+                                            Object.keys(payload).forEach(function (formKey) {
+                                                formData.append(formKey, payload[formKey]);
+                                            });
+                                        }
+                                        if (!(method === 'post')) return [3 /*break*/, 2];
+                                        return [4 /*yield*/, axios__default.default.post(url, payload, {
+                                                headers: __assign({}, mergedHeaders)
+                                            })];
+                                    case 1:
+                                        response_1 = _d.sent();
+                                        data = response_1.data, status_1 = response_1.status;
+                                        return [2 /*return*/, {
+                                                status: status_1,
+                                                data: data
+                                            }];
+                                    case 2:
+                                        if (!(method === 'put')) return [3 /*break*/, 4];
+                                        return [4 /*yield*/, axios__default.default.put(url, payload, {
+                                                headers: mergedHeaders
+                                            })];
+                                    case 3:
+                                        response_2 = _d.sent();
+                                        data = response_2.data, status_2 = response_2.status;
+                                        return [2 /*return*/, {
+                                                status: status_2,
+                                                data: data
+                                            }];
+                                    case 4:
+                                        if (!(method === 'patch')) return [3 /*break*/, 6];
+                                        return [4 /*yield*/, axios__default.default.patch(url, payload, {
+                                                headers: mergedHeaders
+                                            })];
+                                    case 5:
+                                        _a = _d.sent(), data = _a.data, status_3 = _a.status;
+                                        return [2 /*return*/, {
+                                                status: status_3,
+                                                data: data
+                                            }];
+                                    case 6:
+                                        if (!(method === 'delete')) return [3 /*break*/, 8];
+                                        return [4 /*yield*/, axios__default.default.delete(url, {
+                                                headers: mergedHeaders
+                                            })];
+                                    case 7:
+                                        _b = _d.sent(), data = _b.data, status_4 = _b.status;
+                                        return [2 /*return*/, {
+                                                status: status_4,
+                                                data: data
+                                            }];
+                                    case 8: return [4 /*yield*/, axios__default.default.get(url, {
+                                            headers: mergedHeaders
+                                        })];
+                                    case 9:
+                                        _c = _d.sent(), data = _c.data, status_5 = _c.status;
+                                        return [2 /*return*/, {
+                                                status: status_5,
+                                                data: data
+                                            }];
+                                }
+                            });
+                        }); };
+                        if (this.shouldRefreshToken && this.onRefreshToken && this.refreshToken) ;
+                        return [4 /*yield*/, sendRequest()
+                            // console.log('Some response: ', response)
+                        ];
                     case 2:
-                        _c = _g.sent(), data = _c.data, status_1 = _c.status;
-                        return [2 /*return*/, {
-                                status: status_1,
-                                data: data
-                            }];
+                        response = _d.sent();
+                        // console.log('Some response: ', response)
+                        return [2 /*return*/, response];
                     case 3:
-                        if (!(method === 'put')) return [3 /*break*/, 5];
-                        return [4 /*yield*/, axios__default.default.put(url, payload)];
-                    case 4:
-                        response = _g.sent();
-                        data = response.data, status_2 = response.status;
-                        return [2 /*return*/, {
-                                status: status_2,
-                                data: data
-                            }];
-                    case 5:
-                        if (!(method === 'patch')) return [3 /*break*/, 7];
-                        return [4 /*yield*/, axios__default.default.patch(url, payload)];
-                    case 6:
-                        _d = _g.sent(), data = _d.data, status_3 = _d.status;
-                        return [2 /*return*/, {
-                                status: status_3,
-                                data: data
-                            }];
-                    case 7:
-                        if (!(method === 'delete')) return [3 /*break*/, 9];
-                        return [4 /*yield*/, axios__default.default.delete(url)];
-                    case 8:
-                        _e = _g.sent(), data = _e.data, status_4 = _e.status;
-                        return [2 /*return*/, {
-                                status: status_4,
-                                data: data
-                            }];
-                    case 9: return [4 /*yield*/, axios__default.default.get(url)];
-                    case 10:
-                        _f = _g.sent(), data = _f.data, status_5 = _f.status;
-                        return [2 /*return*/, {
-                                status: status_5,
-                                data: data
-                            }];
-                    case 11: return [3 /*break*/, 13];
-                    case 12:
-                        error_1 = _g.sent();
+                        error_1 = _d.sent();
+                        data = error_1.response.data;
+                        // console.log('Something goes wrong: ', error)
+                        if (this.shouldRefreshToken && this.shouldRefreshToken(data) && this.onRefreshToken) {
+                            this.onRefreshToken();
+                        }
                         throw {
+                            error: true,
                             errorMessage: error_1.message,
                             status: error_1.status,
-                            data: error_1.data
+                            data: data
                         };
-                    case 13: return [2 /*return*/];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
@@ -268,9 +333,30 @@ var HttpClient = /** @class */ (function () {
     return HttpClient;
 }());
 
+/**
+ * Hook to store the previous value for the props passed to a component
+ * @author Alejandro Quiroz <alejandro.devop@gmail.com>
+ * @version 1.0.0
+ * @param value
+ * @returns
+ */
+var usePrevProps = function (value) {
+    var valuesRef = React.useRef(value);
+    React.useEffect(function () {
+        valuesRef.current = value;
+    });
+    return valuesRef.current;
+};
+
 var RestClientProvider = function (_a) {
     var children = _a.children, config = _a.config;
     var httpClient = React__default.default.useRef(new HttpClient(config));
+    var prevProps = usePrevProps({ auth: config.auth });
+    React__default.default.useEffect(function () {
+        if (prevProps.auth !== config.auth) {
+            httpClient.current.addHeaders({ Authorization: config.auth });
+        }
+    }, [prevProps.auth, config.auth]);
     return (React__default.default.createElement(RestClientContextProvider, { value: {
             client: httpClient.current
         } }, children));
@@ -314,11 +400,11 @@ var useGetLazy = function (url, options) {
 };
 
 var useGet = function (url, options) {
-    var defaultData = (options || {}).defaultData;
-    var _a = useGetLazy(url, options), sendRequest = _a[0], loading = _a[1];
-    var _b = React__default.default.useState(defaultData), data = _b[0], setData = _b[1];
-    var _c = React__default.default.useState(false), requestedOnce = _c[0], setRequestedOnce = _c[1];
-    var _d = React__default.default.useState(false), requesting = _d[0], setRequesting = _d[1];
+    var _a = options || {}, defaultData = _a.defaultData, onCompleted = _a.onCompleted;
+    var _b = useGetLazy(url, options), sendRequest = _b[0], loading = _b[1];
+    var _c = React__default.default.useState(defaultData), data = _c[0], setData = _c[1];
+    var _d = React__default.default.useState(false), requestedOnce = _d[0], setRequestedOnce = _d[1];
+    var _e = React__default.default.useState(false), requesting = _e[0], setRequesting = _e[1];
     var fetchData = React__default.default.useCallback(function (overrideOptions) { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {
@@ -328,6 +414,23 @@ var useGet = function (url, options) {
                     return [4 /*yield*/, sendRequest(overrideOptions)];
                 case 1:
                     response = _a.sent();
+                    if (!onCompleted) return [3 /*break*/, 3];
+                    return [4 /*yield*/, onCompleted(response, {
+                            retry: function (retryOverride) { return __awaiter(void 0, void 0, void 0, function () {
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0: return [4 /*yield*/, sendRequest(__assign(__assign({}, overrideOptions), retryOverride))];
+                                        case 1:
+                                            response = _a.sent();
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            }); }
+                        })];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3:
                     setData(response);
                     setRequestedOnce(true);
                     setRequesting(false);
@@ -349,21 +452,6 @@ var useGet = function (url, options) {
     ];
 };
 
-/**
- * Hook to store the previous value for the props passed to a component
- * @author Alejandro Quiroz <alejandro.devop@gmail.com>
- * @version 1.0.0
- * @param value
- * @returns
- */
-var usePrevProps = function (value) {
-    var valuesRef = React.useRef(value);
-    React.useEffect(function () {
-        valuesRef.current = value;
-    });
-    return valuesRef.current;
-};
-
 var usePost = function (url) {
     var _a = React__default.default.useState(false), loading = _a[0], setLoading = _a[1];
     var client = useApiContext().client;
@@ -383,6 +471,7 @@ var usePost = function (url) {
                     return [2 /*return*/, data];
                 case 2:
                     err_1 = _a.sent();
+                    setLoading(false);
                     return [2 /*return*/, __assign({}, err_1)];
                 case 3: return [2 /*return*/];
             }

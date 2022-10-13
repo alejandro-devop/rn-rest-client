@@ -23,6 +23,7 @@ const usePost = <UrlType extends string>(url: UrlType): UsePostReturnType => {
             // ToDo: handle response for 500 errors
             return data
         } catch (err) {
+            setLoading(false)
             return {
                 ...err
             }

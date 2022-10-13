@@ -5,8 +5,8 @@ import useGetLazy from '../use-get-lazy/useGetLazy'
 const useGet = <UrlType extends string, ResponseType extends any>(
     url: UrlType,
     options?: RequestConfigType
-) => {
-    const { defaultData } = options || {}
+): [ResponseType, boolean, { refresh: (o?: RequestConfigType) => Promise<void> }] => {
+    const { defaultData, onCompleted } = options || {}
     const [sendRequest, loading] = useGetLazy(url, options)
     const [data, setData] = React.useState<ResponseType>(defaultData)
     const [requestedOnce, setRequestedOnce] = React.useState<boolean>(false)
@@ -15,7 +15,14 @@ const useGet = <UrlType extends string, ResponseType extends any>(
     const fetchData = React.useCallback(
         async (overrideOptions?: RequestConfigType) => {
             setRequesting(true)
-            const response = await sendRequest(overrideOptions)
+            let response = await sendRequest(overrideOptions)
+            if (onCompleted) {
+                await onCompleted(response, {
+                    retry: async (retryOverride?: RequestConfigType) => {
+                        response = await sendRequest({ ...overrideOptions, ...retryOverride })
+                    }
+                })
+            }
             setData(response)
             setRequestedOnce(true)
             setRequesting(false)

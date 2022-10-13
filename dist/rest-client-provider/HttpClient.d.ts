@@ -10,12 +10,20 @@ declare class HttpClient {
      * Http headers which you can find here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
      */
     private headers;
+    private token?;
+    private refreshToken?;
+    private readonly shouldRefreshToken?;
+    private readonly onRefreshToken?;
     /**
      * Contains the server where the requests will be send
      */
     private readonly server;
     private readonly endpoints;
     constructor(config: HttpClientConfig);
+    addHeaders: (headers: HeaderTypes) => void;
+    setToken: (token?: string) => HttpClient;
+    setRefresh: (refresh?: string) => HttpClient;
+    getToken: () => string | undefined;
     /**
      * Current headers configured for the client
      * @returns HeaderTypes

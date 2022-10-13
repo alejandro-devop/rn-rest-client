@@ -22,6 +22,13 @@ class HttpClient {
         Accept: 'application/json',
         'Content-Type': 'application/json'
     }
+
+    private token?: string
+    private refreshToken?: string
+
+    // private readonly onRequestDone?: () => boolean
+    private readonly shouldRefreshToken?: (data?: any) => boolean
+    private readonly onRefreshToken?: () => void
     /**
      * Contains the server where the requests will be send
      */
@@ -30,9 +37,35 @@ class HttpClient {
     private readonly endpoints: EndpointsConfigType
 
     constructor(config: HttpClientConfig) {
-        const { server, endpoints } = config
+        const { server, endpoints, onRefreshToken, shouldRefreshToken, auth } = config
         this.server = server
         this.endpoints = endpoints
+        this.shouldRefreshToken = shouldRefreshToken?.bind(this)
+        this.onRefreshToken = onRefreshToken?.bind(this)
+        if (auth !== undefined) {
+            this.addHeaders({ Authorization: auth })
+        }
+    }
+
+    public addHeaders = (headers: HeaderTypes) => {
+        this.headers = {
+            ...this.headers,
+            ...headers
+        }
+    }
+
+    public setToken = (token?: string): HttpClient => {
+        this.token = token
+        return this
+    }
+
+    public setRefresh = (refresh?: string): HttpClient => {
+        this.refreshToken = refresh
+        return this
+    }
+
+    public getToken = () => {
+        return this.token
     }
 
     /**
@@ -139,7 +172,10 @@ class HttpClient {
         url = this.clearMethod(url)
         url = this.executingReplacements(url, options)
         url = this.addUrlParams(url, options)
-
+        // Append a tailing slash to avoid conflicts for headers
+        if (options?.appendSlash) {
+            url = `${url}/`.replace(/\/\//g, '/')
+        }
         return [`${this.server}${url}`, urlDefinedMethod]
     }
 
@@ -148,50 +184,89 @@ class HttpClient {
         config?: DoRequestConfigurationType
     ): Promise<DoRequestResponseType> {
         const [url, methodType] = this.resolvePath(path, config)
-        const { method = 'get' } = config || {}
+        const { method = 'get', form, headers } = config || {}
+
         if (!_.isEmpty(methodType) && methodType !== method) {
             throw new Error('Invalid method for endpoint')
         }
+        const mergedHeaders = {
+            ...this.headers,
+            ...headers
+        }
 
         try {
-            let payload = config?.payload
-            if (method === 'post') {
-                const { data, status } = await axios.post(url, payload)
-                return {
-                    status,
-                    data
+            const sendRequest = async () => {
+                let payload = config?.payload || {}
+                let formData = new FormData()
+                if (form === true && payload) {
+                    mergedHeaders['Content-Type'] = 'multipart/form-data'
+                    Object.keys(payload).forEach((formKey) => {
+                        formData.append(formKey, payload[formKey])
+                    })
                 }
-            } else if (method === 'put') {
-                const response = await axios.put(url, payload)
-                const { data, status } = response
-                return {
-                    status,
-                    data
-                }
-            } else if (method === 'patch') {
-                const { data, status } = await axios.patch(url, payload)
-                return {
-                    status,
-                    data
-                }
-            } else if (method === 'delete') {
-                const { data, status } = await axios.delete(url)
-                return {
-                    status,
-                    data
-                }
-            } else {
-                const { data, status } = await axios.get(url)
-                return {
-                    status,
-                    data
+
+                if (method === 'post') {
+                    const response = await axios.post(url, payload, {
+                        headers: {
+                            ...mergedHeaders
+                        }
+                    })
+                    const { data, status } = response
+                    return {
+                        status,
+                        data
+                    }
+                } else if (method === 'put') {
+                    const response = await axios.put(url, payload, {
+                        headers: mergedHeaders
+                    })
+                    const { data, status } = response
+                    return {
+                        status,
+                        data
+                    }
+                } else if (method === 'patch') {
+                    const { data, status } = await axios.patch(url, payload, {
+                        headers: mergedHeaders
+                    })
+                    return {
+                        status,
+                        data
+                    }
+                } else if (method === 'delete') {
+                    const { data, status } = await axios.delete(url, {
+                        headers: mergedHeaders
+                    })
+                    return {
+                        status,
+                        data
+                    }
+                } else {
+                    const { data, status } = await axios.get(url, {
+                        headers: mergedHeaders
+                    })
+                    return {
+                        status,
+                        data
+                    }
                 }
             }
+            if (this.shouldRefreshToken && this.onRefreshToken && this.refreshToken) {
+            }
+            const response = await sendRequest()
+            // console.log('Some response: ', response)
+            return response
         } catch (error) {
+            const { data } = error.response
+            // console.log('Something goes wrong: ', error)
+            if (this.shouldRefreshToken && this.shouldRefreshToken(data) && this.onRefreshToken) {
+                this.onRefreshToken()
+            }
             throw {
+                error: true,
                 errorMessage: error.message,
                 status: error.status,
-                data: error.data
+                data: data
             }
         }
     }

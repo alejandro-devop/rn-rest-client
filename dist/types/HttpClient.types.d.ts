@@ -1,4 +1,4 @@
-export declare type ContentTypesType = 'application/json';
+export declare type ContentTypesType = 'application/json' | 'multipart/form-data';
 /**
  * Structure that must be followed to define endpoints
  */
@@ -29,12 +29,17 @@ export declare type EndpointsConfigType = {
  */
 export declare type HeaderTypes = {
     Accept?: ContentTypesType;
+    Authorization?: string;
     'Content-Type'?: ContentTypesType;
 };
 export declare type HttpClientConfig = {
     /** Url to the server where the api is allocated */
     server: string;
     endpoints: EndpointsConfigType;
+    auth?: string;
+    onRequestDone?: () => boolean;
+    onRefreshToken?: (data?: any) => void;
+    shouldRefreshToken?: (data?: any) => boolean;
 };
 export declare type HttpMethodType = 'get' | 'post' | 'put' | 'patch' | 'delete';
 export declare type ReplacementsConfigType = {
@@ -51,12 +56,15 @@ export declare type ResolvePathOptions = {
     };
     replacementConfig?: ReplacementsConfigType;
     debugUrl?: boolean;
+    appendSlash?: boolean;
 };
 export declare type DoRequestConfigurationType = ResolvePathOptions & {
     method?: HttpMethodType;
     payload?: {
         [k: string]: any;
     };
+    form?: boolean;
+    headers?: HeaderTypes;
 };
 export declare type DoRequestResponseType = {
     status: number;
@@ -66,7 +74,7 @@ export declare type DoRequestResponseType = {
 };
 export declare type RequestConfigType = {
     defaultData?: any;
-    onCompleted?: (data: any) => Promise<any>;
+    onCompleted?: (data: any, config: any) => Promise<any>;
 } & ResolvePathOptions;
 export declare type RequestConfigOverrideType = {
     replacements?: {

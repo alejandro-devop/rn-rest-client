@@ -1,4 +1,4 @@
-export type ContentTypesType = 'application/json'
+export type ContentTypesType = 'application/json' | 'multipart/form-data'
 
 /**
  * Structure that must be followed to define endpoints
@@ -28,6 +28,7 @@ export type EndpointsConfigType = {
  */
 export type HeaderTypes = {
     Accept?: ContentTypesType
+    Authorization?: string
     'Content-Type'?: ContentTypesType
 }
 
@@ -35,6 +36,10 @@ export type HttpClientConfig = {
     /** Url to the server where the api is allocated */
     server: string
     endpoints: EndpointsConfigType
+    auth?: string
+    onRequestDone?: () => boolean
+    onRefreshToken?: (data?: any) => void
+    shouldRefreshToken?: (data?: any) => boolean
 }
 
 export type HttpMethodType = 'get' | 'post' | 'put' | 'patch' | 'delete'
@@ -50,11 +55,14 @@ export type ResolvePathOptions = {
     urlParams?: { [k: string]: number | string }
     replacementConfig?: ReplacementsConfigType
     debugUrl?: boolean
+    appendSlash?: boolean
 }
 
 export type DoRequestConfigurationType = ResolvePathOptions & {
     method?: HttpMethodType
     payload?: { [k: string]: any }
+    form?: boolean
+    headers?: HeaderTypes
 }
 
 export type DoRequestResponseType = {
@@ -66,7 +74,7 @@ export type DoRequestResponseType = {
 
 export type RequestConfigType = {
     defaultData?: any
-    onCompleted?: (data: any) => Promise<any>
+    onCompleted?: (data: any, config: any) => Promise<any>
 } & ResolvePathOptions
 
 export type RequestConfigOverrideType = {
